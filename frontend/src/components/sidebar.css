@@ -1,0 +1,663 @@
+/* ─────────────────────────────────────────────────────────────
+   Rider AI — Premium Light SaaS Dashboard Sidebar
+   Inspired by TaskMind & modern SaaS aesthetics.
+   Strictly Light theme (#ffffff), calibrated for desktop viewports.
+   ───────────────────────────────────────────────────────────── */
+
+.saas-sidebar {
+  /* Dimensions & Geometry */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 70px;
+  --radius-active: 9px;
+  --radius-card: 14px;
+
+  /* Typography */
+  --font-sidebar: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Colors */
+  --sb-bg: #ffffff;
+  --sb-border: #f1f4f9;
+
+  /* Text & Inks */
+  --sb-text-title: #111827;       /* Dark charcoal */
+  --sb-text-body: #4b5563;        /* Slate 600 */
+  --sb-text-subtle: #6b7280;      /* Slate 500 */
+  --sb-text-muted: #9ca3af;       /* Slate 400 */
+
+  /* Active / Accent */
+  --sb-active-bg: #eff6ff;        /* Soft Blue 50 */
+  --sb-active-text: #2563eb;      /* Vibrant Blue 600 */
+  --sb-active-icon: #2563eb;
+
+  /* Hover */
+  --sb-hover-bg: #f8fafc;         /* Slate 50 */
+  --sb-hover-text: #111827;
+
+  /* Focus & Shadow */
+  --sb-shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --sb-focus-ring: 0 0 0 2px rgba(37, 99, 235, 0.15);
+
+  /* Layout */
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  max-width: var(--sidebar-w);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px 14px;
+  background-color: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  font-family: var(--font-sidebar);
+  color: var(--sb-text-body);
+  user-select: none;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Smooth width transition for expand/collapse */
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.saas-sidebar * {
+  box-sizing: border-box;
+}
+
+/* ── Collapsed Rail State ─────────────────────────────────── */
+.saas-sidebar.is-collapsed {
+  width: var(--sidebar-w-collapsed);
+  min-width: var(--sidebar-w-collapsed);
+  max-width: var(--sidebar-w-collapsed);
+}
+
+/* Hidden in collapsed mode */
+.saas-sidebar.is-collapsed .brand-name,
+.saas-sidebar.is-collapsed .top-user-details,
+.saas-sidebar.is-collapsed .top-user-chevron,
+.saas-sidebar.is-collapsed .nav-item-label,
+.saas-sidebar.is-collapsed .section-heading-text,
+.saas-sidebar.is-collapsed .section-add-btn,
+.saas-sidebar.is-collapsed .top-user-status {
+  display: none;
+}
+
+/* Profile card: center avatar in collapsed mode */
+.saas-sidebar.is-collapsed .top-user-profile-card {
+  padding: 8px;
+  justify-content: center;
+}
+
+/* Brand row: center logo and tighten when collapsed */
+.saas-sidebar.is-collapsed .sidebar-brand-row {
+  padding: 2px 2px 14px;
+  gap: 0;
+}
+
+.saas-sidebar.is-collapsed .sidebar-brand {
+  justify-content: center;
+}
+
+/* Profile container: tighter margin when collapsed */
+.saas-sidebar.is-collapsed .sidebar-top-profile-container {
+  margin-bottom: 10px;
+}
+
+/* Nav buttons: center icon in collapsed rail */
+.saas-sidebar.is-collapsed .nav-button {
+  padding: 0;
+  justify-content: center;
+}
+
+/* Collapsed footer: center icons */
+.saas-sidebar.is-collapsed .sidebar-footer-region {
+  padding-top: 6px;
+}
+
+.saas-sidebar.is-collapsed .footer-link-btn {
+  padding: 0;
+  justify-content: center;
+}
+
+/* Scroll area: no right padding in collapsed mode */
+.saas-sidebar.is-collapsed .sidebar-scroll-area {
+  padding-right: 0;
+}
+
+/* ── 1. Header / Brand ────────────────────────────────────── */
+.sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 2px 14px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.brand-asterisk-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--sb-text-title);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.brand-asterisk-icon svg,
+.brand-asterisk-icon svg * {
+  width: 22px;
+  height: 22px;
+}
+
+.brand-name {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--sb-text-title);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  transition: opacity 0.18s ease, width 0.18s ease;
+}
+
+.brand-toggle-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #374151;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              color 0.15s ease, transform 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.brand-toggle-btn:hover {
+  background-color: var(--sb-hover-bg);
+  border-color: #cbd5e1;
+  color: var(--sb-text-title);
+}
+
+.brand-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.brand-toggle-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ── 2. Top Profile Card ──────────────────────────────────── */
+.sidebar-top-profile-container {
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.top-user-profile-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 10px;
+  border: 1px solid #e9edf3;
+  border-radius: var(--radius-card);
+  background-color: #ffffff;
+  box-shadow: var(--sb-shadow-xs);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+              box-shadow 0.15s ease, padding 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.top-user-profile-card:hover {
+  border-color: #cbd5e1;
+  background-color: #fcfdfe;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+}
+
+.top-user-profile-card:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-focus-ring);
+}
+
+.top-user-avatar-wrapper {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.top-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.top-user-avatar .avatar-art {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.top-user-online-dot {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 9px;
+  height: 9px;
+  background-color: #22c55e;
+  border: 1.75px solid #ffffff;
+  border-radius: 50%;
+}
+
+.top-user-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.18s ease;
+}
+
+.top-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sb-text-title);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.top-user-status {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--sb-text-subtle);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.top-user-chevron {
+  display: inline-flex;
+  color: var(--sb-text-subtle);
+  flex-shrink: 0;
+  transition: color 0.12s ease, opacity 0.18s ease;
+}
+
+.top-user-profile-card:hover .top-user-chevron {
+  color: var(--sb-text-title);
+}
+
+.top-user-chevron svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ── 3. Middle Navigation Section ─────────────────────────── */
+.sidebar-scroll-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.sidebar-scroll-area::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-scroll-area::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 999px;
+}
+
+.sidebar-scroll-area::-webkit-scrollbar-thumb:hover {
+  background-color: #cbd5e1;
+}
+
+.nav-group {
+  display: block;
+}
+
+.nav-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-menu-item {
+  width: 100%;
+}
+
+.nav-button {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--radius-active);
+  background: transparent;
+  color: var(--sb-text-body);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease,
+              padding 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.nav-button:hover {
+  background-color: var(--sb-hover-bg);
+  color: var(--sb-hover-text);
+}
+
+.nav-button:focus-visible {
+  outline: none;
+  box-shadow: var(--sb-focus-ring);
+}
+
+/* Active state */
+.nav-button.is-active {
+  background-color: var(--sb-active-bg);
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.nav-button.is-active .nav-item-label {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+/* Nav Item Icon Container - Subtle Light-Tinted SaaS Style */
+.nav-icon-container {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+.nav-button:hover .nav-icon-container {
+  transform: scale(1.05);
+}
+
+.saas-sidebar.is-collapsed .nav-icon-container {
+  margin: 0 auto;
+}
+
+.nav-icon-container svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Restrained SaaS-style Color System for Navigation Icons */
+.tint-nav-blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+}
+
+.tint-nav-teal {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.14);
+}
+
+.tint-nav-purple {
+  background-color: #eef2ff;
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.14);
+}
+
+.tint-nav-violet {
+  background-color: #f5f3ff;
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.16);
+}
+
+.tint-nav-amber {
+  background-color: #fffbeb;
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.16);
+}
+
+.tint-nav-cyan {
+  background-color: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.14);
+}
+
+.tint-nav-slate {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.14);
+}
+
+/* Label */
+.nav-item-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  color: var(--sb-text-title);
+  transition: opacity 0.18s ease;
+}
+
+.nav-button:hover .nav-item-label {
+  color: #0f172a;
+}
+
+/* Notification Badges */
+.nav-item-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── 5. Bottom Anchored Region ─────────────────────────────── */
+.sidebar-footer-region {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid var(--sb-border);
+  transition: opacity 0.18s ease;
+}
+
+.compact-footer-list {
+  gap: 1px;
+}
+
+.footer-link-btn {
+  height: 32px;
+  padding: 0 8px;
+  font-size: 13.5px;
+  color: var(--sb-text-subtle);
+}
+
+.footer-link-btn:hover {
+  color: var(--sb-text-title);
+  background-color: var(--sb-hover-bg);
+}
+
+.secondary-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--sb-text-muted);
+}
+
+.secondary-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Tooltip (collapsed rail mode) ────────────────────────── */
+.tooltip-wrapper {
+  position: relative;
+  display: contents;
+}
+
+.tooltip-wrapper.tooltip-disabled {
+  display: contents;
+}
+
+.tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  white-space: nowrap;
+  background-color: #1e293b;   /* Slate 800 */
+  color: #f8fafc;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 5px 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+  pointer-events: none;
+  /* Subtle arrow pointing left */
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+  animation: tooltipFadeIn 0.12s ease-out;
+}
+
+/* Tooltip arrow */
+.tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: #1e293b;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Dark Theme Rules for Sidebar
+   ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] .saas-sidebar,
+.dark .saas-sidebar {
+  --sb-bg: #0d1322;
+  --sb-border: #1e293b;
+  --sb-text-title: #f8fafc;
+  --sb-text-body: #cbd5e1;
+  --sb-text-subtle: #94a3b8;
+  --sb-text-muted: #64748b;
+  --sb-active-bg: #1e293b;
+  --sb-active-text: #60a5fa;
+  --sb-active-icon: #60a5fa;
+  --sb-hover-bg: #131d33;
+  --sb-hover-text: #ffffff;
+}
+
+[data-theme="dark"] .top-user-profile-card,
+.dark .top-user-profile-card {
+  background-color: #131d33;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .top-user-profile-card:hover,
+.dark .top-user-profile-card:hover {
+  background-color: #1a2744;
+  border-color: #2e3e60;
+}
+
+[data-theme="dark"] .brand-toggle-btn,
+.dark .brand-toggle-btn {
+  background-color: #131d33;
+  border-color: #1e293b;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .brand-toggle-btn:hover,
+.dark .brand-toggle-btn:hover {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .nav-item-badge,
+.dark .nav-item-badge {
+  background-color: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .nav-button.is-active,
+.dark .nav-button.is-active {
+  background-color: #1e293b;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .nav-button.is-active .nav-item-label,
+.dark .nav-button.is-active .nav-item-label {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .tint-nav-blue, .dark .tint-nav-blue { background-color: rgba(37, 99, 235, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+[data-theme="dark"] .tint-nav-teal, .dark .tint-nav-teal { background-color: rgba(5, 150, 105, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+[data-theme="dark"] .tint-nav-purple, .dark .tint-nav-purple { background-color: rgba(99, 102, 241, 0.2); color: #818cf8; border-color: rgba(99, 102, 241, 0.3); }
+[data-theme="dark"] .tint-nav-violet, .dark .tint-nav-violet { background-color: rgba(139, 92, 246, 0.2); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3); }
+[data-theme="dark"] .tint-nav-amber, .dark .tint-nav-amber { background-color: rgba(217, 119, 6, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+[data-theme="dark"] .tint-nav-cyan, .dark .tint-nav-cyan { background-color: rgba(2, 132, 199, 0.2); color: #38bdf8; border-color: rgba(14, 165, 233, 0.3); }
+[data-theme="dark"] .tint-nav-slate, .dark .tint-nav-slate { background-color: rgba(100, 116, 139, 0.2); color: #94a3b8; border-color: rgba(100, 116, 139, 0.3); }
+
+[data-theme="dark"] .tooltip,
+.dark .tooltip {
+  background-color: #0f172a;
+  border: 1px solid #334155;
+}
+
+[data-theme="dark"] .tooltip::before,
+.dark .tooltip::before {
+  border-right-color: #0f172a;
+}
+

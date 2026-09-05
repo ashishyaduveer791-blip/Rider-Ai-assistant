@@ -1,0 +1,89 @@
+:root {
+  /* Light SaaS tokens */
+  --ink-900: #0f172a;
+  --ink-700: #334155;
+  --ink-500: #64748b;
+  --ink-400: #94a3b8;
+  --ink-300: #cbd5e1;
+  --ink-200: #e2e8f0;
+  --ink-100: #f1f5f9;
+  --ink-50:  #f8fafc;
+
+  --surface: #ffffff;
+  --surface-ground: #f8fafc;
+  --border:  #e2e8f0;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"],
+.dark {
+  --ink-900: #f8fafc;
+  --ink-700: #e2e8f0;
+  --ink-500: #94a3b8;
+  --ink-400: #64748b;
+  --ink-300: #475569;
+  --ink-200: #1e293b;
+  --ink-100: #172033;
+  --ink-50:  #0f172a;
+
+  --surface: #111827;
+  --surface-ground: #0b0f19;
+  --border:  #1e293b;
+
+  color-scheme: dark;
+}
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--surface-ground);
+  color: var(--ink-900);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 32px;
+}
+
+.app-main-inner {
+  max-width: 1360px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 16px 14px;
+  }
+}
+
+/* Custom scrollbar for dark mode */
+[data-theme="dark"] ::-webkit-scrollbar,
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track,
+.dark ::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
