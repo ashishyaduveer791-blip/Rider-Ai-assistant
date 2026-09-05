@@ -4,11 +4,9 @@ const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('rider_theme')
+    // Default to light mode
+    const saved = localStorage.getItem('rider_theme_v2')
     if (saved === 'dark' || saved === 'light') return saved
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark'
-    }
     return 'light'
   })
 
@@ -21,7 +19,7 @@ export function ThemeProvider({ children }) {
       document.documentElement.classList.add('light')
       document.documentElement.classList.remove('dark')
     }
-    localStorage.setItem('rider_theme', theme)
+    localStorage.setItem('rider_theme_v2', theme)
   }, [theme])
 
   const toggleTheme = () => {
