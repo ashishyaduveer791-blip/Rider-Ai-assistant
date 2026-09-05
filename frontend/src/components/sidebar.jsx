@@ -2,9 +2,11 @@ import { useState, useRef } from 'react'
 import { Waypoints } from 'lucide-react'
 import './sidebar.css'
 
-// Lucide-style outline SVG icons with consistent stroke widths
-const Icon = {
-  // Sidebar dock/toggle panel icon
+/* ==========================================================================
+   1. SVG ICONS
+   Clean, reusable outline icons used across the sidebar.
+   ========================================================================== */
+const Icons = {
   SidebarToggle: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect width="18" height="18" x="3" y="3" rx="5" />
@@ -52,7 +54,7 @@ const Icon = {
   ),
   Settings: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l-.15-.09a2 2 0 0 0-.73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
   ),
@@ -113,34 +115,35 @@ const Icon = {
   ),
 }
 
-// Main navigation items
-const primaryNav = [
-  { id: 'dashboard', label: 'Dashboard', icon: <Icon.Dashboard /> },
-  { id: 'events',    label: 'Live Events', icon: <Icon.LiveEvents /> },
-  { id: 'messages',  label: 'Messages',   icon: <Icon.Messages /> },
-  { id: 'assistant', label: 'Assistant',  icon: <Icon.Assistant /> },
-  { id: 'deliveries', label: 'Deliveries', icon: <Icon.Deliveries /> },
-  { id: 'profile',   label: 'Rider Profile', icon: <Icon.RiderProfile /> },
-  { id: 'settings',  label: 'Settings',   icon: <Icon.Settings /> },
+/* ==========================================================================
+   2. NAVIGATION DATA
+   Easily add, remove, or edit sidebar links from these simple arrays.
+   ========================================================================== */
+const PRIMARY_NAV = [
+  { id: 'dashboard',  label: 'Dashboard',     icon: <Icons.Dashboard /> },
+  { id: 'events',     label: 'Live Events',   icon: <Icons.LiveEvents /> },
+  { id: 'messages',   label: 'Messages',      icon: <Icons.Messages /> },
+  { id: 'assistant',  label: 'Assistant',     icon: <Icons.Assistant /> },
+  { id: 'deliveries', label: 'Deliveries',    icon: <Icons.Deliveries /> },
+  { id: 'profile',    label: 'Rider Profile', icon: <Icons.RiderProfile /> },
+  { id: 'settings',   label: 'Settings',      icon: <Icons.Settings /> },
 ]
 
-// Test events with soft tinted container colors
-const testEvents = [
-  { id: 'nav-event', label: 'Navigation Event', icon: <Icon.Pin />, tagColor: 'teal' },
-  { id: 'customer-msg', label: 'Customer Message', icon: <Icon.ChatBubble />, tagColor: 'indigo' },
-  { id: 'customer-call', label: 'Customer Call', icon: <Icon.Phone />, tagColor: 'blue' },
-  { id: 'otp-event', label: 'OTP Event', icon: <Icon.Key />, tagColor: 'amber' },
-  { id: 'manager-msg', label: 'Manager Message', icon: <Icon.Megaphone />, tagColor: 'rose' },
+const TEST_EVENTS = [
+  { id: 'nav-event',     label: 'Navigation Event', icon: <Icons.Pin />,        tagColor: 'teal' },
+  { id: 'customer-msg',  label: 'Customer Message', icon: <Icons.ChatBubble />, tagColor: 'indigo' },
+  { id: 'customer-call', label: 'Customer Call',    icon: <Icons.Phone />,      tagColor: 'blue' },
+  { id: 'otp-event',     label: 'OTP Event',        icon: <Icons.Key />,        tagColor: 'amber' },
+  { id: 'manager-msg',   label: 'Manager Message',  icon: <Icons.Megaphone />,  tagColor: 'rose' },
 ]
 
-// Footer secondary links
-const footerNav = [
-  { id: 'help',     label: 'Help & Support', icon: <Icon.Help /> },
-  { id: 'feedback', label: 'Feedback',       icon: <Icon.Feedback /> },
+const FOOTER_NAV = [
+  { id: 'help',     label: 'Help & Support', icon: <Icons.Help /> },
+  { id: 'feedback', label: 'Feedback',       icon: <Icons.Feedback /> },
 ]
 
-// Maps item ids to tooltip text
-const tooltipMap = {
+// Tooltip lookup mapping for collapsed mode
+const TOOLTIP_LABELS = {
   dashboard: 'Dashboard',
   events: 'Live Events',
   messages: 'Messages',
@@ -157,87 +160,79 @@ const tooltipMap = {
   feedback: 'Feedback',
 }
 
-export default function Sidebar() {
-  const [activeId, setActiveId] = useState('dashboard')
-  // isCollapsed: user's explicit choice to collapse the sidebar.
-  // When collapsed, hovering the sidebar temporarily expands it.
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isHoverExpanded, setIsHoverExpanded] = useState(false)
+/* ==========================================================================
+   3. HELPER COMPONENTS
+   ========================================================================== */
 
-  // Debounced hover: expand briefly, then collapse when the cursor leaves.
-  // The timeout ref prevents flicker when moving between elements inside
-  // the sidebar rail.
-  const hoverTimerRef = useRef(null)
-
-  // True when the sidebar is showing its full width (either expanded
-  // permanently or temporarily via hover over a collapsed rail).
-  const isExpanded = !isCollapsed || isHoverExpanded
+/**
+ * Tooltip wrapper: Displays a floating label only when the sidebar is collapsed
+ */
+function Tooltip({ itemId, showTooltip, children }) {
+  const [visible, setVisible] = useState(false)
+  const timerRef = useRef(null)
 
   const handleMouseEnter = () => {
-    if (isCollapsed) {
-      // Small delay so a stray hover doesn't flash the sidebar open
-      hoverTimerRef.current = setTimeout(() => {
-        setIsHoverExpanded(true)
-      }, 50)
-    }
+    timerRef.current = setTimeout(() => setVisible(true), 150)
   }
 
   const handleMouseLeave = () => {
-    // Clear any pending expand timer
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-      hoverTimerRef.current = null
-    }
+    if (timerRef.current) clearTimeout(timerRef.current)
+    setVisible(false)
+  }
+
+  return (
+    <div
+      className={`tooltip-wrapper${!showTooltip ? ' tooltip-disabled' : ''}`}
+      onMouseEnter={showTooltip ? handleMouseEnter : undefined}
+      onMouseLeave={showTooltip ? handleMouseLeave : undefined}
+    >
+      {children}
+      {showTooltip && visible && (
+        <div className="tooltip" role="tooltip">
+          {TOOLTIP_LABELS[itemId]}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ==========================================================================
+   4. MAIN SIDEBAR COMPONENT
+   ========================================================================== */
+export default function Sidebar() {
+  // Current active page ID
+  const [activeId, setActiveId] = useState('dashboard')
+
+  // Sidebar collapse states:
+  // - isCollapsed: whether the user clicked to collapse the sidebar into a rail
+  // - isHoverExpanded: temporary expansion when hovering over the collapsed rail
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isHoverExpanded, setIsHoverExpanded] = useState(false)
+  const hoverTimerRef = useRef(null)
+
+  // Full width is active if not collapsed OR if temporarily hovered
+  const isExpanded = !isCollapsed || isHoverExpanded
+  // Tooltips are shown only when in narrow collapsed mode
+  const showTooltip = isCollapsed && !isHoverExpanded
+
+  // Expand with a tiny delay on mouse enter
+  const handleMouseEnter = () => {
     if (isCollapsed) {
-      setIsHoverExpanded(false)
+      hoverTimerRef.current = setTimeout(() => setIsHoverExpanded(true), 50)
     }
   }
 
+  // Collapse back immediately on mouse leave
+  const handleMouseLeave = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+    if (isCollapsed) setIsHoverExpanded(false)
+  }
+
+  // Toggle button click handler
   const toggleSidebar = () => {
-    // When the user clicks the toggle, reset any hover state
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-      hoverTimerRef.current = null
-    }
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
     setIsCollapsed(!isCollapsed)
     setIsHoverExpanded(false)
-  }
-
-  // Tooltip component — wraps nav buttons to show a tooltip in collapsed mode
-  const Tooltip = ({ itemId, children }) => {
-    const [show, setShow] = useState(false)
-    const timerRef = useRef(null)
-
-    const handleEnter = () => {
-      timerRef.current = setTimeout(() => setShow(true), 150)
-    }
-
-    const handleLeave = () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
-      setShow(false)
-    }
-
-    // Show tooltip only when the sidebar is in its narrow rail state
-    // (i.e. collapsed and not currently hover-expanded).
-    const showTooltip = isCollapsed && !isHoverExpanded
-
-    return (
-      <div
-        className={`tooltip-wrapper${!showTooltip ? ' tooltip-disabled' : ''}`}
-        onMouseEnter={showTooltip ? handleEnter : undefined}
-        onMouseLeave={showTooltip ? handleLeave : undefined}
-      >
-        {children}
-        {showTooltip && show && (
-          <div className="tooltip" role="tooltip">
-            {tooltipMap[itemId]}
-          </div>
-        )}
-      </div>
-    )
   }
 
   return (
@@ -247,7 +242,7 @@ export default function Sidebar() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* 1. Header / Brand with Waypoints Logo & Toggle Button */}
+      {/* ── Header: Logo & Collapse Button ── */}
       <div className="sidebar-brand-row">
         <div className="sidebar-brand">
           <div className="brand-asterisk-icon" aria-hidden="true">
@@ -255,6 +250,7 @@ export default function Sidebar() {
           </div>
           <span className="brand-name">Rider AI</span>
         </div>
+
         <button
           type="button"
           className="brand-toggle-btn"
@@ -262,11 +258,11 @@ export default function Sidebar() {
           title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
           onClick={toggleSidebar}
         >
-          {isExpanded ? <Icon.SidebarToggle /> : <Icon.ChevronRight />}
+          {isExpanded ? <Icons.SidebarToggle /> : <Icons.ChevronRight />}
         </button>
       </div>
 
-      {/* 2. Profile Card */}
+      {/* ── Top Profile Card ── */}
       <div className="sidebar-top-profile-container">
         <button
           type="button"
@@ -284,7 +280,6 @@ export default function Sidebar() {
                   </linearGradient>
                 </defs>
                 <circle cx="18" cy="18" r="18" fill="url(#riderGrad)" />
-                {/* Rider silhouette with visor/headphones */}
                 <circle cx="18" cy="14" r="7" fill="#0f172a" />
                 <path d="M12 14c0-3.3 2.7-6 6-6s6 2.7 6 6" fill="#38bdf8" opacity="0.9" />
                 <rect x="13" y="13" width="10" height="3" rx="1.5" fill="#38bdf8" />
@@ -293,26 +288,28 @@ export default function Sidebar() {
             </div>
             <span className="top-user-online-dot" aria-hidden="true" />
           </div>
+
           <div className="top-user-details">
             <span className="top-user-name">Rider 01</span>
             <span className="top-user-status">Online</span>
           </div>
+
           <span className="top-user-chevron">
-            <Icon.ChevronDown />
+            <Icons.ChevronDown />
           </span>
         </button>
       </div>
 
-      {/* 3. Middle Navigation Section */}
+      {/* ── Middle Scrollable Menu ── */}
       <div className="sidebar-scroll-area">
         {/* Primary Navigation */}
         <nav className="nav-group" aria-label="Main Menu">
           <ul className="nav-menu-list">
-            {primaryNav.map((item) => {
+            {PRIMARY_NAV.map((item) => {
               const isActive = activeId === item.id
               return (
                 <li key={item.id} className="nav-menu-item">
-                  <Tooltip itemId={item.id}>
+                  <Tooltip itemId={item.id} showTooltip={showTooltip}>
                     <button
                       type="button"
                       className={`nav-button ${isActive ? 'is-active' : ''}`}
@@ -332,7 +329,7 @@ export default function Sidebar() {
           </ul>
         </nav>
 
-        {/* 4. Test Events Section */}
+        {/* Test Events Section */}
         <div className="sidebar-section-divider" />
         <div className="test-events-group">
           <div className="section-header-row">
@@ -343,16 +340,16 @@ export default function Sidebar() {
               aria-label="Add new test event"
               title="Add event"
             >
-              <Icon.Plus />
+              <Icons.Plus />
             </button>
           </div>
 
           <ul className="nav-menu-list">
-            {testEvents.map((item) => {
+            {TEST_EVENTS.map((item) => {
               const isActive = activeId === item.id
               return (
                 <li key={item.id} className="nav-menu-item">
-                  <Tooltip itemId={item.id}>
+                  <Tooltip itemId={item.id} showTooltip={showTooltip}>
                     <button
                       type="button"
                       className={`nav-button test-event-button ${isActive ? 'is-active' : ''}`}
@@ -371,14 +368,14 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* 5. Bottom Secondary Navigation */}
+      {/* ── Bottom Secondary Links ── */}
       <div className="sidebar-footer-region">
         <ul className="nav-menu-list compact-footer-list">
-          {footerNav.map((item) => {
+          {FOOTER_NAV.map((item) => {
             const isActive = activeId === item.id
             return (
               <li key={item.id} className="nav-menu-item">
-                <Tooltip itemId={item.id}>
+                <Tooltip itemId={item.id} showTooltip={showTooltip}>
                   <button
                     type="button"
                     className={`nav-button footer-link-btn ${isActive ? 'is-active' : ''}`}
@@ -396,3 +393,4 @@ export default function Sidebar() {
     </aside>
   )
 }
+
