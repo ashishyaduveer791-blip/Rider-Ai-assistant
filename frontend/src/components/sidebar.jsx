@@ -118,23 +118,16 @@ const Icons = {
 /* ==========================================================================
    2. NAVIGATION DATA
    Easily add, remove, or edit sidebar links from these simple arrays.
+   Restrained SaaS-style color system for icons.
    ========================================================================== */
 const PRIMARY_NAV = [
-  { id: 'dashboard',  label: 'Dashboard',     icon: <Icons.Dashboard /> },
-  { id: 'events',     label: 'Live Events',   icon: <Icons.LiveEvents /> },
-  { id: 'messages',   label: 'Messages',      icon: <Icons.Messages /> },
-  { id: 'assistant',  label: 'Assistant',     icon: <Icons.Assistant /> },
-  { id: 'deliveries', label: 'Deliveries',    icon: <Icons.Deliveries /> },
-  { id: 'profile',    label: 'Rider Profile', icon: <Icons.RiderProfile /> },
-  { id: 'settings',   label: 'Settings',      icon: <Icons.Settings /> },
-]
-
-const TEST_EVENTS = [
-  { id: 'nav-event',     label: 'Navigation Event', icon: <Icons.Pin />,        tagColor: 'teal' },
-  { id: 'customer-msg',  label: 'Customer Message', icon: <Icons.ChatBubble />, tagColor: 'indigo' },
-  { id: 'customer-call', label: 'Customer Call',    icon: <Icons.Phone />,      tagColor: 'blue' },
-  { id: 'otp-event',     label: 'OTP Event',        icon: <Icons.Key />,        tagColor: 'amber' },
-  { id: 'manager-msg',   label: 'Manager Message',  icon: <Icons.Megaphone />,  tagColor: 'rose' },
+  { id: 'dashboard',  label: 'Dashboard',     icon: <Icons.Dashboard />,    color: 'blue' },
+  { id: 'events',     label: 'Live Events',   icon: <Icons.LiveEvents />,   color: 'teal' },
+  { id: 'messages',   label: 'Messages',      icon: <Icons.Messages />,     color: 'purple', badge: 'Soon' },
+  { id: 'assistant',  label: 'Assistant',     icon: <Icons.Assistant />,    color: 'violet' },
+  { id: 'deliveries', label: 'Deliveries',    icon: <Icons.Deliveries />,   color: 'amber',  badge: 'Soon' },
+  { id: 'profile',    label: 'Rider Profile', icon: <Icons.RiderProfile />, color: 'cyan',   badge: 'Soon' },
+  { id: 'settings',   label: 'Settings',      icon: <Icons.Settings />,     color: 'slate',  badge: 'Soon' },
 ]
 
 const FOOTER_NAV = [
@@ -151,11 +144,6 @@ const TOOLTIP_LABELS = {
   deliveries: 'Deliveries',
   profile: 'Rider Profile',
   settings: 'Settings',
-  'nav-event': 'Navigation Event',
-  'customer-msg': 'Customer Message',
-  'customer-call': 'Customer Call',
-  'otp-event': 'OTP Event',
-  'manager-msg': 'Manager Message',
   help: 'Help & Support',
   feedback: 'Feedback',
 }
@@ -199,9 +187,17 @@ function Tooltip({ itemId, showTooltip, children }) {
 /* ==========================================================================
    4. MAIN SIDEBAR COMPONENT
    ========================================================================== */
-export default function Sidebar() {
-  // Current active page ID
-  const [activeId, setActiveId] = useState('dashboard')
+export default function Sidebar({ activeRoute, onNavigate }) {
+  // Current active page ID (controlled or uncontrolled)
+  const [internalActiveId, setInternalActiveId] = useState('dashboard')
+  const activeId = activeRoute !== undefined ? activeRoute : internalActiveId
+
+  const handleNavClick = (id) => {
+    setInternalActiveId(id)
+    if (onNavigate) {
+      onNavigate(id)
+    }
+  }
 
   // Sidebar collapse states:
   // - isCollapsed: whether the user clicked to collapse the sidebar into a rail
@@ -313,10 +309,12 @@ export default function Sidebar() {
                     <button
                       type="button"
                       className={`nav-button ${isActive ? 'is-active' : ''}`}
-                      onClick={() => setActiveId(item.id)}
+                      onClick={() => handleNavClick(item.id)}
                       aria-current={isActive ? 'page' : undefined}
                     >
-                      <span className="nav-item-icon">{item.icon}</span>
+                      <span className={`nav-icon-container tint-nav-${item.color}`}>
+                        {item.icon}
+                      </span>
                       <span className="nav-item-label">{item.label}</span>
                       {item.badge && (
                         <span className="nav-item-badge">{item.badge}</span>
@@ -328,44 +326,6 @@ export default function Sidebar() {
             })}
           </ul>
         </nav>
-
-        {/* Test Events Section */}
-        <div className="sidebar-section-divider" />
-        <div className="test-events-group">
-          <div className="section-header-row">
-            <span className="section-heading-text">TEST EVENTS</span>
-            <button
-              type="button"
-              className="section-add-btn"
-              aria-label="Add new test event"
-              title="Add event"
-            >
-              <Icons.Plus />
-            </button>
-          </div>
-
-          <ul className="nav-menu-list">
-            {TEST_EVENTS.map((item) => {
-              const isActive = activeId === item.id
-              return (
-                <li key={item.id} className="nav-menu-item">
-                  <Tooltip itemId={item.id} showTooltip={showTooltip}>
-                    <button
-                      type="button"
-                      className={`nav-button test-event-button ${isActive ? 'is-active' : ''}`}
-                      onClick={() => setActiveId(item.id)}
-                    >
-                      <span className={`event-icon-container tint-${item.tagColor}`}>
-                        {item.icon}
-                      </span>
-                      <span className="nav-item-label">{item.label}</span>
-                    </button>
-                  </Tooltip>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
       </div>
 
       {/* ── Bottom Secondary Links ── */}
@@ -379,10 +339,13 @@ export default function Sidebar() {
                   <button
                     type="button"
                     className={`nav-button footer-link-btn ${isActive ? 'is-active' : ''}`}
-                    onClick={() => setActiveId(item.id)}
+                    onClick={() => handleNavClick(item.id)}
                   >
                     <span className="nav-item-icon secondary-icon">{item.icon}</span>
                     <span className="nav-item-label">{item.label}</span>
+                    {item.badge && (
+                      <span className="nav-item-badge dev-badge-tag">{item.badge}</span>
+                    )}
                   </button>
                 </Tooltip>
               </li>

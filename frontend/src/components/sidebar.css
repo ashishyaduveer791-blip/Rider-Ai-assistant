@@ -107,15 +107,14 @@
   justify-content: center;
 }
 
-/* Test events section hidden in collapsed mode */
-.saas-sidebar.is-collapsed .sidebar-section-divider,
-.saas-sidebar.is-collapsed .test-events-group {
-  display: none;
+/* Collapsed footer: center icons */
+.saas-sidebar.is-collapsed .sidebar-footer-region {
+  padding-top: 6px;
 }
 
-/* Footer hidden in collapsed mode */
-.saas-sidebar.is-collapsed .sidebar-footer-region {
-  display: none;
+.saas-sidebar.is-collapsed .footer-link-btn {
+  padding: 0;
+  justify-content: center;
 }
 
 /* Scroll area: no right padding in collapsed mode */
@@ -380,33 +379,80 @@
 /* Active state */
 .nav-button.is-active {
   background-color: var(--sb-active-bg);
-  color: var(--sb-active-text);
+  color: #1e3a8a;
   font-weight: 600;
 }
 
-.nav-button.is-active .nav-item-icon {
-  color: var(--sb-active-icon);
+.nav-button.is-active .nav-item-label {
+  color: #1e3a8a;
+  font-weight: 600;
 }
 
-/* Icon */
-.nav-item-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  color: var(--sb-text-subtle);
+/* Nav Item Icon Container - Subtle Light-Tinted SaaS Style */
+.nav-icon-container {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-  transition: color 0.12s ease, transform 0.12s ease;
+  transition: transform 0.12s ease, background-color 0.12s ease;
 }
 
-.nav-button:hover .nav-item-icon {
-  color: var(--sb-text-title);
+.nav-button:hover .nav-icon-container {
+  transform: scale(1.05);
 }
 
-.nav-item-icon svg {
-  width: 18px;
-  height: 18px;
+.saas-sidebar.is-collapsed .nav-icon-container {
+  margin: 0 auto;
+}
+
+.nav-icon-container svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Restrained SaaS-style Color System for Navigation Icons */
+.tint-nav-blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+}
+
+.tint-nav-teal {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.14);
+}
+
+.tint-nav-purple {
+  background-color: #eef2ff;
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.14);
+}
+
+.tint-nav-violet {
+  background-color: #f5f3ff;
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.16);
+}
+
+.tint-nav-amber {
+  background-color: #fffbeb;
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.16);
+}
+
+.tint-nav-cyan {
+  background-color: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.14);
+}
+
+.tint-nav-slate {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.14);
 }
 
 /* Label */
@@ -417,7 +463,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: -0.01em;
+  color: var(--sb-text-title);
   transition: opacity 0.18s ease;
+}
+
+.nav-button:hover .nav-item-label {
+  color: #0f172a;
 }
 
 /* Notification Badges */
@@ -436,135 +487,6 @@
   font-weight: 600;
   line-height: 1;
   flex-shrink: 0;
-}
-
-/* ── 4. Section Divider & TEST EVENTS ────────────────────── */
-.sidebar-section-divider {
-  height: 1px;
-  background: var(--sb-border);
-  margin: 2px 0 4px;
-  flex-shrink: 0;
-  transition: opacity 0.18s ease;
-}
-
-.test-events-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: opacity 0.18s ease;
-}
-
-.section-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 6px 4px;
-}
-
-.section-heading-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--sb-text-muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: opacity 0.18s ease;
-}
-
-.section-add-btn {
-  width: 20px;
-  height: 20px;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--sb-text-muted);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  padding: 0;
-  transition: background-color 0.12s ease, color 0.12s ease, opacity 0.18s ease;
-}
-
-.section-add-btn:hover {
-  background-color: var(--sb-hover-bg);
-  color: var(--sb-text-title);
-}
-
-.section-add-btn svg {
-  width: 13px;
-  height: 13px;
-}
-
-/* Test Event Item */
-.test-event-button {
-  gap: 10px;
-  height: 40px;
-  padding: 0 8px;
-}
-
-.test-event-button .nav-item-label {
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--sb-text-body);
-}
-
-.test-event-button:hover .nav-item-label {
-  color: var(--sb-text-title);
-}
-
-.test-event-button.is-active .nav-item-label {
-  color: var(--sb-active-text);
-  font-weight: 600;
-}
-
-/* Tinted Icon Containers */
-.event-icon-container {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  transition: transform 0.12s ease;
-}
-
-.test-event-button:hover .event-icon-container {
-  transform: scale(1.04);
-}
-
-.event-icon-container svg {
-  width: 14px;
-  height: 14px;
-}
-
-/* Color variants */
-.tint-teal {
-  background-color: #ecfdf5;
-  color: #059669;
-  border: 1px solid rgba(5, 150, 105, 0.15);
-}
-
-.tint-indigo {
-  background-color: #eef2ff;
-  color: #4f46e5;
-  border: 1px solid rgba(79, 70, 229, 0.15);
-}
-
-.tint-blue {
-  background-color: #eff6ff;
-  color: #2563eb;
-  border: 1px solid rgba(37, 99, 235, 0.15);
-}
-
-.tint-amber {
-  background-color: #fffbeb;
-  color: #d97706;
-  border: 1px solid rgba(217, 119, 6, 0.18);
-}
-
-.tint-rose {
-  background-color: #fff1f2;
-  color: #e11d48;
-  border: 1px solid rgba(225, 29, 72, 0.15);
 }
 
 /* ── 5. Bottom Anchored Region ─────────────────────────────── */
@@ -658,3 +580,84 @@
     transform: translateY(-50%) translateX(0);
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Dark Theme Rules for Sidebar
+   ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] .saas-sidebar,
+.dark .saas-sidebar {
+  --sb-bg: #0d1322;
+  --sb-border: #1e293b;
+  --sb-text-title: #f8fafc;
+  --sb-text-body: #cbd5e1;
+  --sb-text-subtle: #94a3b8;
+  --sb-text-muted: #64748b;
+  --sb-active-bg: #1e293b;
+  --sb-active-text: #60a5fa;
+  --sb-active-icon: #60a5fa;
+  --sb-hover-bg: #131d33;
+  --sb-hover-text: #ffffff;
+}
+
+[data-theme="dark"] .top-user-profile-card,
+.dark .top-user-profile-card {
+  background-color: #131d33;
+  border-color: #1e293b;
+}
+
+[data-theme="dark"] .top-user-profile-card:hover,
+.dark .top-user-profile-card:hover {
+  background-color: #1a2744;
+  border-color: #2e3e60;
+}
+
+[data-theme="dark"] .brand-toggle-btn,
+.dark .brand-toggle-btn {
+  background-color: #131d33;
+  border-color: #1e293b;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .brand-toggle-btn:hover,
+.dark .brand-toggle-btn:hover {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .nav-item-badge,
+.dark .nav-item-badge {
+  background-color: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .nav-button.is-active,
+.dark .nav-button.is-active {
+  background-color: #1e293b;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .nav-button.is-active .nav-item-label,
+.dark .nav-button.is-active .nav-item-label {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .tint-nav-blue, .dark .tint-nav-blue { background-color: rgba(37, 99, 235, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+[data-theme="dark"] .tint-nav-teal, .dark .tint-nav-teal { background-color: rgba(5, 150, 105, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+[data-theme="dark"] .tint-nav-purple, .dark .tint-nav-purple { background-color: rgba(99, 102, 241, 0.2); color: #818cf8; border-color: rgba(99, 102, 241, 0.3); }
+[data-theme="dark"] .tint-nav-violet, .dark .tint-nav-violet { background-color: rgba(139, 92, 246, 0.2); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3); }
+[data-theme="dark"] .tint-nav-amber, .dark .tint-nav-amber { background-color: rgba(217, 119, 6, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+[data-theme="dark"] .tint-nav-cyan, .dark .tint-nav-cyan { background-color: rgba(2, 132, 199, 0.2); color: #38bdf8; border-color: rgba(14, 165, 233, 0.3); }
+[data-theme="dark"] .tint-nav-slate, .dark .tint-nav-slate { background-color: rgba(100, 116, 139, 0.2); color: #94a3b8; border-color: rgba(100, 116, 139, 0.3); }
+
+[data-theme="dark"] .tooltip,
+.dark .tooltip {
+  background-color: #0f172a;
+  border: 1px solid #334155;
+}
+
+[data-theme="dark"] .tooltip::before,
+.dark .tooltip::before {
+  border-right-color: #0f172a;
+}
+
