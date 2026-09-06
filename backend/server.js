@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const classifyRoute = require('../ai/classifyRoute');
 const priorityRoute = require('../ai/priorityRoute');
+const speechPlannerRoute = require('../ai/speechPlannerRoute');
 
 const app = express();
 app.use(cors());
@@ -15,6 +16,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api', classifyRoute);
 app.use('/api', priorityRoute);
+app.use('/api', speechPlannerRoute);
 
 app.use((err, req, res, next) => {
   console.error('[server] unhandled error:', err);
