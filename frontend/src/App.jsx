@@ -1,3 +1,7 @@
+/**
+ * Rider AI Assistant - Operational Dashboard Shell
+ * Real-time delivery cockpit featuring live route navigation, interactive order details, and AI HUD.
+ */
 import { useState, useEffect } from 'react'
 import Sidebar from './components/sidebar'
 import Dashboard from './components/Dashboard'

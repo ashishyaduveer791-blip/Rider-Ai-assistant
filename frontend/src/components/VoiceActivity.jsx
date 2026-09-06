@@ -1,4 +1,6 @@
-import { Mic, MicOff } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
+import ttsService from '../libs/tts'
 
 export default function VoiceActivity({
   state = 'listening', // 'idle' | 'listening' | 'thinking' | 'speaking'
@@ -10,6 +12,21 @@ export default function VoiceActivity({
   const isThinking = state === 'thinking'
   const isListening = state === 'listening'
 
+  const [isMuted, setIsMuted] = useState(ttsService.isMuted())
+
+  useEffect(() => {
+    const handleMuteChange = (e) => {
+      setIsMuted(e.detail.isMuted)
+    }
+    window.addEventListener('rider-tts-mute-change', handleMuteChange)
+    return () => window.removeEventListener('rider-tts-mute-change', handleMuteChange)
+  }, [])
+
+  const handleToggleMute = () => {
+    const nextMuted = ttsService.toggleMute()
+    setIsMuted(nextMuted)
+  }
+
   // Formatted status label and display timer
   const statusLabel = isIdle
     ? 'Standby (Muted)'
@@ -19,7 +36,7 @@ export default function VoiceActivity({
     ? 'Processing'
     : 'Listening'
 
-  const displayDuration = duration || (isIdle ? '00:00' : isThinking ? '00:03' : isSpeaking ? '00:06' : '00:08')
+  const displayDuration = duration || (isIdle ? '00:00' : isThinking ? '00:03' : isSpeaking ? '00:05' : '00:08')
 
   const displayTranscript =
     transcript ||
@@ -28,7 +45,7 @@ export default function VoiceActivity({
       : isThinking
       ? 'Analyzing routing parameters & dispatch instructions...'
       : isSpeaking
-      ? 'Relaying turn-by-turn bypass alert to rider headset.'
+      ? 'Relaying audio response to rider headset.'
       : 'Customer is asking about gate access.')
 
   const statusColorClass = isIdle
@@ -49,10 +66,23 @@ export default function VoiceActivity({
           <span className="voice-heading">Voice Activity</span>
         </div>
 
-        <div className={`voice-status-badge ${statusColorClass}`}>
-          <span className={`voice-pulse-dot ${isIdle ? 'is-dormant-dot' : ''}`} />
-          <span className="voice-status-text">{statusLabel}</span>
-          <span className="voice-timer-text">{displayDuration}</span>
+        <div className="voice-controls-right">
+          {/* Audio TTS Mute/Unmute Toggle */}
+          <button
+            type="button"
+            className={`voice-tts-toggle-btn ${isMuted ? 'is-muted' : 'is-active'}`}
+            onClick={handleToggleMute}
+            title={isMuted ? 'Speech Audio is Muted • Click to un-mute TTS' : 'Speech Audio Active • Click to mute'}
+          >
+            {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+            <span>{isMuted ? 'Muted' : 'Audio On'}</span>
+          </button>
+
+          <div className={`voice-status-badge ${statusColorClass}`}>
+            <span className={`voice-pulse-dot ${isIdle ? 'is-dormant-dot' : ''}`} />
+            <span className="voice-status-text">{statusLabel}</span>
+            <span className="voice-timer-text">{displayDuration}</span>
+          </div>
         </div>
       </div>
 

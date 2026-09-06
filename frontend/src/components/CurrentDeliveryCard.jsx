@@ -1,38 +1,38 @@
+import { useState } from 'react'
 import { Clock, User, Navigation, ShieldCheck, ArrowUpRight, Compass, PhoneCall } from 'lucide-react'
 import RouteMap from './RouteMap'
+import { useRiderTracking } from '../hooks/useRiderTracking'
+import DeliveryDetailsModal from './DeliveryDetailsModal'
+import CustomerCallModal from './CustomerCallModal'
 
-export default function CurrentDeliveryCard({ onSimulateNav }) {
-  // Structured Route Data Model
-  const routeData = {
-    origin: {
-      label: 'Hub 04 (Depot)',
-      address: 'Sector 12 Logistics Yard',
-      lat: 28.4595,
-      lng: 77.0266,
-    },
-    destination: {
-      label: 'Rahul Sharma',
-      address: 'Apt 4B, Hillcrest Heights, Sector 14',
-      lat: 28.4715,
-      lng: 77.0421,
-    },
-    waypoints: [
-      {
-        id: 'wp-1',
-        label: 'Sector 14 Link',
-        lat: 28.4650,
-        lng: 77.0340,
-        note: 'Fastest corridor',
-      },
-    ],
-    currentPosition: {
-      lat: 28.4635,
-      lng: 77.0315,
-      speed: '32 km/h',
-      heading: 'NE',
-    },
-    progress: 70,
-    status: 'in-transit',
+export default function CurrentDeliveryCard({ onSimulateNav, onCallEvent, onDeliveryEvent }) {
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false)
+  const [showCallModal, setShowCallModal] = useState(false)
+
+  const {
+    origin,
+    destination,
+    route,
+    currentPosition,
+    metrics,
+    mode,
+    setMode,
+    isPaused,
+    togglePause,
+    resetToStart,
+    gpsError,
+  } = useRiderTracking()
+
+  const handleToggleTrackingMode = () => {
+    setMode((prev) => (prev === 'simulated' ? 'gps' : 'simulated'))
+  }
+
+  const handleDeliveryConfirmed = (detail) => {
+    if (onDeliveryEvent) onDeliveryEvent(detail)
+  }
+
+  const handleCallCompleted = (detail) => {
+    if (onCallEvent) onCallEvent(detail)
   }
 
   return (
@@ -60,18 +60,18 @@ export default function CurrentDeliveryCard({ onSimulateNav }) {
               <User size={18} />
             </div>
             <div>
-              <h2 className="customer-name">Rahul Sharma</h2>
-              <p className="delivery-address">Apt 4B, Hillcrest Heights, Sector 14</p>
+              <h2 className="customer-name">{destination.label}</h2>
+              <p className="delivery-address">{destination.address}</p>
             </div>
           </div>
 
-          {/* Quick Metrics Bar */}
+          {/* Quick Metrics Bar with Live Telemetry */}
           <div className="delivery-metrics-row">
             <div className="delivery-metric-box">
               <span className="metric-caption">Estimated Arrival</span>
               <div className="metric-val-wrap">
                 <Clock size={16} className="metric-icon blue" />
-                <span className="metric-bold">12 min</span>
+                <span className="metric-bold">{metrics.etaMinutes} min</span>
               </div>
             </div>
 
@@ -79,7 +79,7 @@ export default function CurrentDeliveryCard({ onSimulateNav }) {
               <span className="metric-caption">Remaining Distance</span>
               <div className="metric-val-wrap">
                 <Navigation size={16} className="metric-icon teal" />
-                <span className="metric-bold">2.4 km</span>
+                <span className="metric-bold">{metrics.remainingDistance}</span>
               </div>
             </div>
 
@@ -93,15 +93,19 @@ export default function CurrentDeliveryCard({ onSimulateNav }) {
           </div>
         </div>
 
-        {/* Abstracted Delivery Route Map */}
+        {/* Live Interactive Leaflet Delivery Route Map */}
         <div className="delivery-route-preview">
           <RouteMap
-            origin={routeData.origin}
-            destination={routeData.destination}
-            waypoints={routeData.waypoints}
-            currentPosition={routeData.currentPosition}
-            progress={routeData.progress}
-            status={routeData.status}
+            origin={origin}
+            destination={destination}
+            route={route}
+            currentPosition={currentPosition}
+            isPaused={isPaused}
+            onTogglePause={togglePause}
+            onResetSimulation={resetToStart}
+            trackingMode={mode}
+            onToggleMode={handleToggleTrackingMode}
+            gpsError={gpsError}
           />
         </div>
       </div>
@@ -109,7 +113,7 @@ export default function CurrentDeliveryCard({ onSimulateNav }) {
       {/* Delivery Progress Stepper */}
       <div className="delivery-progress-section">
         <div className="progress-bar-track">
-          <div className="progress-bar-fill" style={{ width: '70%' }} />
+          <div className="progress-bar-fill" style={{ width: `${metrics.progress}%` }} />
         </div>
         <div className="progress-steps-row">
           <div className="progress-step is-complete">
@@ -120,24 +124,25 @@ export default function CurrentDeliveryCard({ onSimulateNav }) {
             <span className="step-bullet" />
             <span className="step-label">In Transit</span>
           </div>
-          <div className="progress-step is-active">
+          <div className={`progress-step ${metrics.status === 'delivered' ? 'is-complete' : 'is-active'}`}>
             <span className="step-bullet" />
-            <span className="step-label">Approaching (2.4 km)</span>
+            <span className="step-label">Approaching ({metrics.remainingDistance})</span>
           </div>
-          <div className="progress-step is-pending">
+          <div className={`progress-step ${metrics.status === 'delivered' ? 'is-complete' : 'is-pending'}`}>
             <span className="step-bullet" />
             <span className="step-label">Delivered</span>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons with Real Interactive Modals */}
       <div className="delivery-actions-footer">
         <div className="actions-left">
           <button
             type="button"
             className="btn-primary-delivery"
-            title="View full delivery breakdown"
+            onClick={() => setShowDeliveryModal(true)}
+            title="View full delivery breakdown & order items"
           >
             <span>View Delivery</span>
             <ArrowUpRight size={16} />
@@ -157,13 +162,34 @@ export default function CurrentDeliveryCard({ onSimulateNav }) {
           <button
             type="button"
             className="btn-quick-call"
-            title="Quick contact customer"
+            onClick={() => setShowCallModal(true)}
+            title="Call customer Rahul Sharma (+91 98765 43210)"
           >
             <PhoneCall size={15} />
             <span>Call Customer</span>
           </button>
         </div>
       </div>
+
+      {/* View Delivery Details Modal */}
+      <DeliveryDetailsModal
+        isOpen={showDeliveryModal}
+        onClose={() => setShowDeliveryModal(false)}
+        destination={destination}
+        origin={origin}
+        metrics={metrics}
+        onConfirmDelivered={handleDeliveryConfirmed}
+      />
+
+      {/* Real Customer Calling Modal HUD */}
+      <CustomerCallModal
+        isOpen={showCallModal}
+        onClose={() => setShowCallModal(false)}
+        customerName={destination.label}
+        customerPhone="+91 98765 43210"
+        destinationAddress={destination.address}
+        onCallCompleted={handleCallCompleted}
+      />
     </div>
   )
 }

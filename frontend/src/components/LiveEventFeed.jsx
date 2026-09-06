@@ -4,33 +4,21 @@ import {
   Phone,
   Key,
   Megaphone,
+  AlertTriangle,
   Clock,
   Inbox,
-  AlertTriangle,
   RotateCcw,
 } from 'lucide-react'
 
 // Icon resolver matching sidebar aesthetic exactly
 const getEventIcon = (type) => {
-  switch (type) {
-    case 'nav-event':
-    case 'navigation':
-      return <MapPin size={15} />
-    case 'customer-msg':
-    case 'message':
-      return <MessageSquare size={15} />
-    case 'customer-call':
-    case 'call':
-      return <Phone size={15} />
-    case 'otp-event':
-    case 'otp':
-      return <Key size={15} />
-    case 'manager-msg':
-    case 'manager':
-      return <Megaphone size={15} />
-    default:
-      return <MessageSquare size={15} />
-  }
+  const normType = String(type || '').toLowerCase()
+  if (normType.includes('safety')) return <AlertTriangle size={15} />
+  if (normType.includes('nav')) return <MapPin size={15} />
+  if (normType.includes('call')) return <Phone size={15} />
+  if (normType.includes('otp')) return <Key size={15} />
+  if (normType.includes('manager')) return <Megaphone size={15} />
+  return <MessageSquare size={15} />
 }
 
 export default function LiveEventFeed({
@@ -45,12 +33,12 @@ export default function LiveEventFeed({
       <div className="live-event-head">
         <div className="feed-title-col">
           <div className="feed-header-left">
-            <h3 className="feed-title">Live Events</h3>
+            <h3 className="feed-title">Live Events & Queue</h3>
             <span className="feed-count-pill">
               {isLoading ? 'Syncing...' : isError ? 'Offline' : `${events.length} Events`}
             </span>
           </div>
-          <p className="feed-subtitle">Real-time delivery telemetry and dispatch notifications</p>
+          <p className="feed-subtitle">Real-time delivery telemetry evaluated by AAS Engine</p>
         </div>
       </div>
 
@@ -107,27 +95,48 @@ export default function LiveEventFeed({
         {/* Chronological List */}
         {!isLoading && !isError && events.length > 0 && (
           <ul className="events-timeline-list" aria-label="Chronological events">
-            {events.map((evt, idx) => (
-              <li key={evt.id || idx} className={`event-timeline-item ${evt.isNew ? 'is-new-anim' : ''}`}>
-                <div className="timeline-connector-col">
-                  <div className={`event-badge-icon tint-${evt.tagColor || 'blue'}`}>
-                    {getEventIcon(evt.type)}
+            {events.map((evt, idx) => {
+              const decisionClass = evt.decision ? `feed-decision-${evt.decision.toLowerCase()}` : ''
+              return (
+                <li key={evt.id || idx} className={`event-timeline-item ${evt.isNew ? 'is-new-anim' : ''}`}>
+                  <div className="timeline-connector-col">
+                    <div className={`event-badge-icon tint-${evt.tagColor || 'blue'}`}>
+                      {getEventIcon(evt.type)}
+                    </div>
+                    {idx < events.length - 1 && <div className="timeline-line" />}
                   </div>
-                  {idx < events.length - 1 && <div className="timeline-line" />}
-                </div>
 
-                <div className="event-content-bubble">
-                  <div className="event-content-top">
-                    <span className="event-category-name">{evt.title}</span>
-                    <span className="event-time-badge">
-                      <Clock size={12} />
-                      <span>{evt.timestamp}</span>
-                    </span>
+                  <div className="event-content-bubble">
+                    <div className="event-content-top">
+                      <div className="event-title-badge-group">
+                        <span className="event-category-name">{evt.title}</span>
+                        {evt.decision && (
+                          <span className={`feed-decision-pill ${decisionClass}`} title={`AAS Decision: ${evt.decision}`}>
+                            {evt.decision}
+                          </span>
+                        )}
+                        {evt.basePriority !== undefined && (
+                          <span className="feed-priority-pill" title={`Base priority score: ${evt.basePriority}`}>
+                            P:{evt.basePriority}
+                          </span>
+                        )}
+                      </div>
+                      <span className="event-time-badge">
+                        <Clock size={12} />
+                        <span>{evt.timestamp}</span>
+                      </span>
+                    </div>
+                    <p className="event-description">{evt.description}</p>
+                    {evt.reasonCode && (
+                      <div className="event-meta-footer">
+                        <span className="event-reason-tag">Rule: {evt.reasonCode}</span>
+                        {evt.status && <span className="event-status-tag">Status: {evt.status}</span>}
+                      </div>
+                    )}
                   </div>
-                  <p className="event-description">{evt.description}</p>
-                </div>
-              </li>
-            ))}
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>

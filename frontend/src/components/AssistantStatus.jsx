@@ -20,36 +20,16 @@ export default function AssistantStatus({
   const cycleIndexRef = useRef(0)
   const timerRef = useRef(null)
 
-  // Sync if external state changes from simulation controls
+  // Sync if external state changes from real events (Socket.IO, TTS, etc.)
   useEffect(() => {
     if (externalState && externalState !== internalState) {
       setInternalState(externalState)
-      const matchedIdx = CYCLE_SEQUENCE.findIndex((item) => item.state === externalState)
-      if (matchedIdx !== -1) {
-        cycleIndexRef.current = matchedIdx
-      }
     }
   }, [externalState])
 
-  // Automatic state progression: Listening → Thinking → Speaking → Idle → repeat
-  useEffect(() => {
-    const currentStep = CYCLE_SEQUENCE.find((item) => item.state === internalState) || CYCLE_SEQUENCE[0]
-
-    timerRef.current = setTimeout(() => {
-      const nextIdx = (cycleIndexRef.current + 1) % CYCLE_SEQUENCE.length
-      cycleIndexRef.current = nextIdx
-      const nextStep = CYCLE_SEQUENCE[nextIdx]
-      setInternalState(nextStep.state)
-
-      if (onStateChange) {
-        onStateChange(nextStep.state)
-      }
-    }, currentStep.duration)
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
-  }, [internalState, onStateChange])
+  // NOTE: Auto-cycling timer removed. Assistant state is now driven exclusively
+  // by real system events (socket messages, TTS callbacks) via the externalState prop.
+  // This prevents the UI from misleadingly showing "Speaking" when nothing is happening.
 
   // State presentation metadata
   const stateMeta = {

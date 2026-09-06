@@ -1,0 +1,86 @@
+[
+  {
+    "id": "event-001",
+    "type": "CUSTOMER_MESSAGE",
+    "source": "customer",
+    "content": "Gate 1 is closed. Use Gate 3.",
+    "basePriority": 70,
+    "semanticPriority": null,
+    "timestamp": 1732000000000,
+    "status": "PENDING",
+    "decision": null,
+    "reasonCode": null
+  },
+  {
+    "id": "event-002",
+    "type": "NAVIGATION",
+    "source": "system",
+    "content": "Turn left in 200 meters onto MG Road.",
+    "basePriority": 75,
+    "semanticPriority": 40,
+    "timestamp": 1732000005000,
+    "status": "EVALUATED",
+    "decision": "SPEAK",
+    "reasonCode": "DEFAULT"
+  },
+  {
+    "id": "event-003",
+    "type": "CUSTOMER_CALL",
+    "source": "customer",
+    "content": "Incoming call from customer regarding order #4521.",
+    "basePriority": 85,
+    "semanticPriority": 90,
+    "timestamp": 1732000010000,
+    "status": "DELIVERED",
+    "decision": "SPEAK",
+    "reasonCode": "HIGH_URGENCY"
+  },
+  {
+    "id": "event-004",
+    "type": "OTP",
+    "source": "system",
+    "content": "Your OTP for delivery confirmation is 4821.",
+    "basePriority": 90,
+    "semanticPriority": 85,
+    "timestamp": 1732000015000,
+    "status": "DELIVERED",
+    "decision": "SPEAK",
+    "reasonCode": "DEFAULT"
+  },
+  {
+    "id": "event-005",
+    "type": "MANAGER_MESSAGE",
+    "source": "manager",
+    "content": "Please complete deliveries before 6 PM today.",
+    "basePriority": 60,
+    "semanticPriority": 30,
+    "timestamp": 1732000020000,
+    "status": "WAITING",
+    "decision": "WAIT",
+    "reasonCode": "USER_BUSY"
+  },
+  {
+    "id": "event-006",
+    "type": "RIDER_VOICE",
+    "source": "rider",
+    "content": "Mark this order as delivered.",
+    "basePriority": 80,
+    "semanticPriority": 75,
+    "timestamp": 1732000025000,
+    "status": "DELIVERED",
+    "decision": "SPEAK",
+    "reasonCode": "DEFAULT"
+  },
+  {
+    "id": "event-007",
+    "type": "SAFETY_ALERT",
+    "source": "system",
+    "content": "Heavy traffic accident reported ahead. Reroute advised.",
+    "basePriority": 100,
+    "semanticPriority": 100,
+    "timestamp": 1732000030000,
+    "status": "DELIVERED",
+    "decision": "SPEAK",
+    "reasonCode": "CRITICAL_SAFETY"
+  }
+]
