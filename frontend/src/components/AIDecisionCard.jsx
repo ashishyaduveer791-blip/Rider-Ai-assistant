@@ -11,8 +11,8 @@ import {
 
 export default function AIDecisionCard({
   decision = {
-    trigger: 'Traffic bottleneck detected on Outer Ring Rd',
-    response: 'Switching route to Sector 14 Link via flyover to save 4 minutes.',
+    trigger: 'Traffic bottleneck detected near Nanda Ki Chowki',
+    response: 'Switching route to Bidholi Road via Sudhowala bypass to save 5 minutes.',
     action: 'Turn-by-turn route automatically updated in Rider HUD',
     timestamp: 'Just now',
     confidence: 'High Confidence',

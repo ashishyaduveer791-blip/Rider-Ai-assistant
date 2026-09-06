@@ -1,125 +1,336 @@
-import { Navigation, MapPin } from 'lucide-react'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import { Navigation, Play, Pause, RotateCcw, Crosshair, Radio } from 'lucide-react'
 
-/**
- * RouteMap Component
- * Abstracted delivery route visualization with a structured props data model.
- * Drop-in replaceable with Mapbox GL, Leaflet, or Google Maps later.
- *
- * @param {Object} origin - { label, lat, lng, address }
- * @param {Object} destination - { label, lat, lng, address }
- * @param {Array} waypoints - Array of { id, label, lat, lng, note }
- * @param {Object} currentPosition - { lat, lng, speed, heading }
- * @param {number} progress - 0 to 100 percentage along the route
- * @param {string} status - 'pickup' | 'in-transit' | 'approaching' | 'delivered'
- */
+// Fix default marker icon asset paths if ever used by Leaflet internals
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+})
+
+// Custom HTML Pin for Origin (Depot)
+const createOriginIcon = () =>
+  L.divIcon({
+    className: 'custom-map-pin origin-pin',
+    html: `
+      <div class="pin-marker-wrap depot-wrap">
+        <div class="pin-core depot-core"></div>
+      </div>
+    `,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  })
+
+// Custom HTML Pin for Destination (Customer)
+const createDestinationIcon = () =>
+  L.divIcon({
+    className: 'custom-map-pin destination-pin',
+    html: `
+      <div class="pin-marker-wrap destination-wrap">
+        <div class="dest-pulse"></div>
+        <div class="dest-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+      </div>
+    `,
+    iconSize: [28, 28],
+    iconAnchor: [14, 26],
+  })
+
+// Custom HTML Pin for Live Rider with Radar Pulse and Directional Heading Arrow
+const createRiderIcon = (heading = 0) =>
+  L.divIcon({
+    className: 'custom-map-pin rider-pin',
+    html: `
+      <div class="rider-marker-container">
+        <div class="rider-radar-pulse"></div>
+        <div class="rider-dot-center">
+          <div class="rider-heading-arrow" style="transform: rotate(${heading}deg);">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2">
+              <polygon points="12 2 19 21 12 17 5 21 12 2"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  })
+
 export default function RouteMap({
-  origin = {
-    label: 'Hub 04 (Depot)',
-    address: 'Sector 12 Logistics Yard',
-    lat: 28.4595,
-    lng: 77.0266,
-  },
-  destination = {
-    label: 'Rahul Sharma',
-    address: 'Apt 4B, Hillcrest Heights, Sector 14',
-    lat: 28.4715,
-    lng: 77.0421,
-  },
-  waypoints = [
-    {
-      id: 'wp-1',
-      label: 'Sector 14 Flyover Link',
-      lat: 28.4650,
-      lng: 77.0340,
-      note: 'Fastest corridor',
-    },
-  ],
-  currentPosition = {
-    lat: 28.4635,
-    lng: 77.0315,
-    speed: '32 km/h',
-    heading: 'NE',
-  },
-  progress = 70,
-  status = 'in-transit',
+  origin,
+  destination,
+  route = [],
+  currentPosition,
+  waypoints = [],
+  isPaused,
+  onTogglePause,
+  onResetSimulation,
+  trackingMode = 'simulated',
+  onToggleMode,
+  gpsError,
 }) {
+  const mapContainerRef = useRef(null)
+  const mapInstanceRef = useRef(null)
+  const tileLayerRef = useRef(null)
+  const riderMarkerRef = useRef(null)
+  const originMarkerRef = useRef(null)
+  const destMarkerRef = useRef(null)
+  const polylineRef = useRef(null)
+  const polylineGlowRef = useRef(null)
+
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => document.documentElement.getAttribute('data-theme') === 'dark'
+  )
+
+  // Listen to theme changes to dynamically swap map tile styling
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+      setIsDarkMode(isDark)
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class'],
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  // Initialize Map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapInstanceRef.current) return
+
+    const initialCenter = currentPosition
+      ? [currentPosition.lat, currentPosition.lng]
+      : [origin.lat, origin.lng]
+
+    const map = L.map(mapContainerRef.current, {
+      center: initialCenter,
+      zoom: 14,
+      zoomControl: false,
+      attributionControl: false,
+      dragging: true,
+      touchZoom: true,
+      scrollWheelZoom: false,
+      doubleClickZoom: true,
+    })
+
+    // 100% Free OpenStreetMap tiles (zero API key required, zero watermarks in both light & dark mode)
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+
+    const tiles = L.tileLayer(tileUrl, {
+      maxZoom: 19,
+      subdomains: 'abc',
+    }).addTo(map)
+
+    tileLayerRef.current = tiles
+
+    // Draw route polylines
+    if (route && route.length > 0) {
+      polylineGlowRef.current = L.polyline(route, {
+        color: '#3B82F6',
+        weight: 6,
+        opacity: 0.25,
+        lineCap: 'round',
+        lineJoin: 'round',
+      }).addTo(map)
+
+      polylineRef.current = L.polyline(route, {
+        color: '#2563EB',
+        weight: 3.5,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round',
+      }).addTo(map)
+
+      const bounds = L.latLngBounds(route)
+      map.fitBounds(bounds, { padding: [24, 24], maxZoom: 15 })
+    }
+
+    // Origin Depot Marker
+    if (origin) {
+      originMarkerRef.current = L.marker([origin.lat, origin.lng], {
+        icon: createOriginIcon(),
+        interactive: true,
+      })
+        .addTo(map)
+        .bindTooltip(`<b>Origin</b><br>${origin.label}`, {
+          direction: 'top',
+          offset: [0, -10],
+          className: 'map-custom-tooltip',
+        })
+    }
+
+    // Destination Marker
+    if (destination) {
+      destMarkerRef.current = L.marker([destination.lat, destination.lng], {
+        icon: createDestinationIcon(),
+        interactive: true,
+      })
+        .addTo(map)
+        .bindTooltip(`<b>Drop-off</b><br>${destination.label}`, {
+          direction: 'top',
+          offset: [0, -22],
+          className: 'map-custom-tooltip',
+        })
+    }
+
+    // Rider Live Position Marker
+    if (currentPosition) {
+      riderMarkerRef.current = L.marker([currentPosition.lat, currentPosition.lng], {
+        icon: createRiderIcon(currentPosition.heading || 0),
+        zIndexOffset: 1000,
+      })
+        .addTo(map)
+        .bindTooltip(`<b>Rider Live</b><br>Speed: ${currentPosition.speed} km/h`, {
+          direction: 'top',
+          offset: [0, -16],
+          className: 'map-custom-tooltip',
+        })
+    }
+
+    mapInstanceRef.current = map
+
+    const timer = setTimeout(() => {
+      map.invalidateSize()
+    }, 200)
+
+    return () => {
+      clearTimeout(timer)
+      map.remove()
+      mapInstanceRef.current = null
+    }
+  }, [])
+
+  // Update Rider Marker position and heading dynamically
+  useEffect(() => {
+    if (!currentPosition || !mapInstanceRef.current) return
+
+    const { lat, lng, speed, heading } = currentPosition
+    const newLatLng = L.latLng(lat, lng)
+
+    if (riderMarkerRef.current) {
+      riderMarkerRef.current.setLatLng(newLatLng)
+      riderMarkerRef.current.setIcon(createRiderIcon(heading || 0))
+      riderMarkerRef.current.setTooltipContent(`<b>Rider Live</b><br>Speed: ${speed} km/h`)
+    } else {
+      riderMarkerRef.current = L.marker(newLatLng, {
+        icon: createRiderIcon(heading || 0),
+        zIndexOffset: 1000,
+      }).addTo(mapInstanceRef.current)
+    }
+
+    // Smoothly pan along as rider progresses
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.panTo(newLatLng, {
+        animate: true,
+        duration: 1.2,
+        easeLinearity: 0.25,
+      })
+    }
+  }, [currentPosition])
+
+  // Manual recenter handler
+  const handleRecenter = useCallback(() => {
+    if (!mapInstanceRef.current || !currentPosition) return
+    mapInstanceRef.current.setView([currentPosition.lat, currentPosition.lng], 15, {
+      animate: true,
+    })
+  }, [currentPosition])
+
+  // Fit all route view handler
+  const handleFitRoute = useCallback(() => {
+    if (!mapInstanceRef.current || !route || route.length === 0) return
+    const bounds = L.latLngBounds(route)
+    mapInstanceRef.current.fitBounds(bounds, { padding: [20, 20], maxZoom: 15, animate: true })
+  }, [route])
+
   return (
-    <div className="route-map-canvas" aria-label={`Delivery Route: ${origin.label} to ${destination.label}`}>
-      <svg viewBox="0 0 320 170" fill="none" className="route-svg" aria-hidden="true">
-        {/* Abstract road grid background lines */}
-        <path d="M10 30h300M10 85h300M10 140h300" stroke="#E2E8F0" strokeWidth="1.5" strokeDasharray="4 4" />
-        <path d="M60 10v150M160 10v150M260 10v150" stroke="#E2E8F0" strokeWidth="1.5" strokeDasharray="4 4" />
+    <div className="route-map-canvas live-map-wrapper" aria-label="Real-time live delivery map">
+      {/* Real Leaflet Map Container */}
+      <div ref={mapContainerRef} className="leaflet-map-host" />
 
-        {/* Gray underlying street route */}
-        <path
-          d="M10 110 C 90 110, 100 45, 180 45 S 250 120, 300 120"
-          stroke="#CBD5E1"
-          strokeWidth="6"
-          strokeLinecap="round"
-          opacity="0.4"
-        />
+      {/* Floating Telemetry & Controls Overlay */}
+      <div className="map-overlay-layer">
+        {/* Top-Right Map Actions */}
+        <div className="map-action-buttons">
+          <button
+            type="button"
+            className="map-control-btn"
+            onClick={handleRecenter}
+            title="Recenter on Rider"
+            aria-label="Recenter on Rider"
+          >
+            <Crosshair size={13} />
+          </button>
+          <button
+            type="button"
+            className="map-control-btn"
+            onClick={handleFitRoute}
+            title="View Full Route"
+            aria-label="View Full Route"
+          >
+            <Navigation size={13} />
+          </button>
+          {trackingMode === 'simulated' && (
+            <>
+              <button
+                type="button"
+                className="map-control-btn"
+                onClick={onTogglePause}
+                title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
+                aria-label={isPaused ? 'Resume' : 'Pause'}
+              >
+                {isPaused ? <Play size={12} fill="currentColor" /> : <Pause size={12} fill="currentColor" />}
+              </button>
+              <button
+                type="button"
+                className="map-control-btn"
+                onClick={onResetSimulation}
+                title="Restart Route"
+                aria-label="Restart Route"
+              >
+                <RotateCcw size={12} />
+              </button>
+            </>
+          )}
+        </div>
 
-        {/* Active Route Path */}
-        <path
-          id="activeRoutePath"
-          d="M40 120 C 100 120, 110 55, 180 55 S 240 105, 280 85"
-          stroke="#2563EB"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        {/* Bottom Floating Telemetry & Mode Chip */}
+        <div className="map-bottom-bar">
+          <div className="map-floating-chip live-telemetry-chip">
+            <span className={`live-dot ${isPaused ? 'paused' : ''}`} />
+            <span className="telemetry-speed-text">
+              {trackingMode === 'gps' ? 'Live GPS' : 'Rider on track'} • {currentPosition?.speed || 32} km/h
+            </span>
+          </div>
 
-        {/* Origin / Starting Point */}
-        <circle cx="40" cy="120" r="5" fill="#64748B" />
-        <circle cx="40" cy="120" r="2" fill="#FFFFFF" />
+          {/* Mode Switcher Pill: Simulated vs Real GPS */}
+          <button
+            type="button"
+            className={`map-mode-pill ${trackingMode === 'gps' ? 'is-gps' : 'is-sim'}`}
+            onClick={onToggleMode}
+            title={`Current: ${trackingMode === 'gps' ? 'Device GPS' : 'Live Simulation'}. Click to toggle`}
+          >
+            <Radio size={11} className={trackingMode === 'gps' ? 'pulse-radio' : ''} />
+            <span>{trackingMode === 'gps' ? 'GPS Active' : 'Simulated'}</span>
+          </button>
+        </div>
 
-        {/* Visual Connector: Dashed line linking Rider GPS position to the telemetry chip */}
-        <line
-          x1="180"
-          y1="62"
-          x2="180"
-          y2="135"
-          stroke="#2563EB"
-          strokeWidth="1.5"
-          strokeDasharray="3 3"
-          opacity="0.5"
-        />
-        <line
-          x1="180"
-          y1="135"
-          x2="110"
-          y2="135"
-          stroke="#2563EB"
-          strokeWidth="1.5"
-          strokeDasharray="3 3"
-          opacity="0.5"
-        />
-
-        {/* Rider Current Position Pin with animated radar ping */}
-        <circle cx="180" cy="55" r="14" fill="rgba(37, 99, 235, 0.15)" className="rider-radar-ring" />
-        <circle cx="180" cy="55" r="7" fill="#2563EB" />
-        <circle cx="180" cy="55" r="3" fill="#FFFFFF" />
-
-        {/* Destination Pin */}
-        <g transform="translate(270, 68)">
-          <circle cx="10" cy="17" r="4" fill="#059669" />
-          <path d="M10 2a7 7 0 0 0-7 7c0 5 7 12 7 12s7-7 7-12a7 7 0 0 0-7-7z" fill="#059669" />
-          <circle cx="10" cy="9" r="2.5" fill="#FFFFFF" />
-        </g>
-
-        {/* Road Labels from Waypoint / Route Metadata */}
-        <text x="75" y="115" fill="#94A3B8" fontSize="9" fontWeight="500">
-          Outer Ring Rd
-        </text>
-        <text x="195" y="45" fill="#2563EB" fontSize="9" fontWeight="600">
-          {waypoints[0]?.label || 'Sector 14 Link'}
-        </text>
-      </svg>
-
-      {/* Floating Telemetry Chip with visual connector anchor */}
-      <div className="map-floating-chip has-connector">
-        <span className="live-dot" />
-        <span className="telemetry-speed-text">Rider on track • {currentPosition.speed}</span>
+        {/* GPS Error Notification if device denies location */}
+        {gpsError && (
+          <div className="map-gps-error-banner" role="alert">
+            <span>GPS error: {gpsError}</span>
+          </div>
+        )}
       </div>
     </div>
   )

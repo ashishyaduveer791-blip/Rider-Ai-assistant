@@ -41,7 +41,7 @@ export default function DashboardHeader({ assistantState }) {
     {
       id: 'notif-1',
       title: 'Route Alert',
-      desc: 'Traffic bottleneck detected on Outer Ring Rd. Sector 14 Link bypass recommended.',
+      desc: 'Traffic bottleneck detected near Nanda Ki Chowki. Bidholi Road UPES bypass recommended.',
       time: '4m ago',
       type: 'alert',
     },

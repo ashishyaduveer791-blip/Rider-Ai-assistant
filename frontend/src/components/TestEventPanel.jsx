@@ -15,7 +15,7 @@ export default function TestEventPanel({ onTriggerEvent, onResetEvents }) {
       label: 'Navigation Event',
       icon: <MapPin size={16} />,
       tagColor: 'teal',
-      sampleDesc: 'Route recalculated • Avoiding Sector 14 congestion',
+      sampleDesc: 'Route recalculated • Avoiding Nanda Ki Chowki congestion towards UPES',
     },
     {
       type: 'customer-msg',
@@ -43,7 +43,7 @@ export default function TestEventPanel({ onTriggerEvent, onResetEvents }) {
       label: 'Manager Message',
       icon: <Megaphone size={16} />,
       tagColor: 'rose',
-      sampleDesc: 'New delivery instruction received from Hub 04',
+      sampleDesc: 'New delivery instruction received from Prem Nagar Hub 03',
     },
   ]
 

@@ -15,7 +15,7 @@ const INITIAL_EVENTS = [
     id: 'evt-1',
     type: 'nav-event',
     title: 'Navigation Event',
-    description: 'Route recalculated • Avoiding Sector 14 congestion',
+    description: 'Route recalculated • Avoiding Nanda Ki Chowki congestion towards UPES',
     timestamp: getRecentTimeString(3),
     tagColor: 'teal',
   },
@@ -39,7 +39,7 @@ const INITIAL_EVENTS = [
     id: 'evt-4',
     type: 'manager-msg',
     title: 'Manager Message',
-    description: 'New delivery instruction received from Hub 04',
+    description: 'New delivery instruction received from Prem Nagar Hub 03',
     timestamp: getRecentTimeString(25),
     tagColor: 'rose',
   },
@@ -72,8 +72,8 @@ export default function Dashboard({
 
   // 4. Latest AI Decision
   const [localDecision, setLocalDecision] = useState({
-    trigger: 'Traffic bottleneck detected on Outer Ring Rd',
-    response: 'Switching route to Sector 14 Link via flyover to save 4 minutes.',
+    trigger: 'Traffic bottleneck detected near Nanda Ki Chowki',
+    response: 'Switching route to Bidholi Road via Sudhowala bypass to save 5 minutes.',
     action: 'Turn-by-turn route automatically updated in Rider HUD',
     timestamp: 'Just now',
     confidence: 'High Confidence',
@@ -123,8 +123,8 @@ export default function Dashboard({
 
     if (opt.type === 'nav-event') {
       decisionPayload = {
-        trigger: 'Traffic bottleneck detected on Outer Ring Rd',
-        response: 'Switching route to Sector 14 Link via flyover to save 4 minutes.',
+        trigger: 'Traffic bottleneck detected near Nanda Ki Chowki',
+        response: 'Switching route to Bidholi Road via Sudhowala bypass to save 5 minutes.',
         action: 'Turn-by-turn route automatically updated in Rider HUD',
         timestamp: 'Just now',
         confidence: 'High Confidence',
@@ -188,8 +188,8 @@ export default function Dashboard({
     setAssistantState('listening')
     setAiInteractions(27)
     setLatestDecision({
-      trigger: 'Traffic bottleneck detected on Outer Ring Rd',
-      response: 'Switching route to Sector 14 Link via flyover to save 4 minutes.',
+      trigger: 'Traffic bottleneck detected near Nanda Ki Chowki',
+      response: 'Switching route to Bidholi Road via Sudhowala bypass to save 5 minutes.',
       action: 'Turn-by-turn route automatically updated in Rider HUD',
       timestamp: 'Just now',
       confidence: 'High Confidence',
@@ -218,7 +218,23 @@ export default function Dashboard({
                 type: 'nav-event',
                 label: 'Navigation Event',
                 tagColor: 'teal',
-                sampleDesc: 'Route recalculated • Avoiding Sector 14 congestion',
+                sampleDesc: 'Route recalculated • Avoiding Nanda Ki Chowki congestion towards UPES',
+              })
+            }
+            onCallEvent={(detail) =>
+              handleTriggerEvent({
+                type: 'customer-call',
+                label: 'Customer Call',
+                tagColor: 'blue',
+                sampleDesc: detail,
+              })
+            }
+            onDeliveryEvent={(detail) =>
+              handleTriggerEvent({
+                type: 'otp-event',
+                label: 'Order Delivered',
+                tagColor: 'amber',
+                sampleDesc: detail,
               })
             }
           />
