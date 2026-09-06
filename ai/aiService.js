@@ -7,7 +7,7 @@ try {
 const getApiKey = () => process.env.GEMINI_API_KEY;
 const getGeminiUrl = () => `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${getApiKey()}`;
 
-async function callLLM(systemPrompt, userMessage, { timeoutMs = 8000 } = {}) {
+async function callLLM(systemPrompt, userMessage, { timeoutMs = 20000 } = {}) {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY missing in environment');
