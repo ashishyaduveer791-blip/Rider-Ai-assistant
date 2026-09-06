@@ -1,10 +1,15 @@
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (e) {
+  // Dotenv is configured by host process or backend
+}
 
-const API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${API_KEY}`;
+const getApiKey = () => process.env.GEMINI_API_KEY;
+const getGeminiUrl = () => `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${getApiKey()}`;
 
 async function callLLM(systemPrompt, userMessage, { timeoutMs = 8000 } = {}) {
-  if (!API_KEY) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
     throw new Error('GEMINI_API_KEY missing in environment');
   }
 
@@ -12,7 +17,7 @@ async function callLLM(systemPrompt, userMessage, { timeoutMs = 8000 } = {}) {
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(getGeminiUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

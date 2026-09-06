@@ -4602,6 +4602,235 @@
   text-decoration: underline;
 }
 
+/* ==========================================================================
+   AAS Real-Time Arbitration UI & Badge Architecture
+   ========================================================================== */
+
+.assistant-online-chip.is-offline {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
+.online-pulse-pip.is-offline-pip {
+  background-color: #ef4444;
+  animation: none;
+}
+
+/* AIDecisionCard AAS Tags */
+.decision-aas-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.decision-tag-speak {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.decision-tag-wait {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.decision-tag-merge {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.decision-tag-drop {
+  background-color: rgba(244, 63, 94, 0.12);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.decision-reason-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.stage-type-subtag,
+.stage-priority-subtag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+  background-color: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+/* LiveEventFeed AAS Badges */
+.event-title-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.feed-decision-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.feed-decision-speak {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.feed-decision-wait {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.feed-decision-merge {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.feed-decision-drop {
+  background-color: rgba(244, 63, 94, 0.12);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.feed-priority-pill {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748b;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.event-meta-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.event-reason-tag,
+.event-status-tag {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Dark theme overrides for AAS elements */
+[data-theme="dark"] .decision-reason-pill,
+.dark .decision-reason-pill {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .stage-type-subtag,
+.dark .stage-type-subtag,
+[data-theme="dark"] .stage-priority-subtag,
+.dark .stage-priority-subtag {
+  background-color: #1e293b;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .feed-priority-pill,
+.dark .feed-priority-pill {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+/* TTS Voice Controls */
+.voice-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-tts-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.voice-tts-toggle-btn:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.voice-tts-toggle-btn.is-active {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
+}
+
+.voice-tts-toggle-btn.is-muted {
+  background-color: #fff1f2;
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+
+[data-theme="dark"] .voice-tts-toggle-btn,
+.dark .voice-tts-toggle-btn {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .voice-tts-toggle-btn.is-active,
+.dark .voice-tts-toggle-btn.is-active {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+[data-theme="dark"] .voice-tts-toggle-btn.is-muted,
+.dark .voice-tts-toggle-btn.is-muted {
+  background-color: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #fb7185;
+}
+
+
+
 
 
 

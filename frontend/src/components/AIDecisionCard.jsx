@@ -7,13 +7,56 @@ import {
   AlertTriangle,
   RotateCcw,
   Inbox,
+  Clock,
+  Radio,
+  PauseCircle,
+  GitMerge,
+  XCircle,
 } from 'lucide-react'
+
+// Decision configuration helper for AAS outputs
+const getDecisionMeta = (decisionType) => {
+  switch (decisionType) {
+    case 'SPEAK':
+      return {
+        label: 'SPEAK',
+        className: 'decision-tag-speak',
+        icon: <Radio size={12} className="tag-icon-pulse" />,
+        color: '#10b981',
+      }
+    case 'WAIT':
+      return {
+        label: 'WAIT',
+        className: 'decision-tag-wait',
+        icon: <PauseCircle size={12} />,
+        color: '#f59e0b',
+      }
+    case 'MERGE':
+      return {
+        label: 'MERGE',
+        className: 'decision-tag-merge',
+        icon: <GitMerge size={12} />,
+        color: '#6366f1',
+      }
+    case 'DROP':
+      return {
+        label: 'DROP',
+        className: 'decision-tag-drop',
+        icon: <XCircle size={12} />,
+        color: '#f43f5e',
+      }
+    default:
+      return null
+  }
+}
 
 export default function AIDecisionCard({
   decision = {
     trigger: 'Traffic bottleneck detected near Nanda Ki Chowki',
     response: 'Switching route to Bidholi Road via Sudhowala bypass to save 5 minutes.',
     action: 'Turn-by-turn route automatically updated in Rider HUD',
+    decision: 'SPEAK',
+    reasonCode: 'CRITICAL_SAFETY',
     timestamp: 'Just now',
     confidence: 'High Confidence',
   },
@@ -22,6 +65,11 @@ export default function AIDecisionCard({
   errorMessage = 'Failed to evaluate AI decision rules for incoming telemetry.',
   onRetry,
 }) {
+  const decisionType = decision?.decision?.toUpperCase()
+  const decisionMeta = decisionType ? getDecisionMeta(decisionType) : null
+  const triggerText = decision?.trigger || decision?.content || decision?.label
+  const reasonCode = decision?.reasonCode
+
   return (
     <div className="ai-decision-card hero-ai-feature">
       {/* Header */}
@@ -32,15 +80,33 @@ export default function AIDecisionCard({
           </div>
           <div>
             <div className="decision-badge-row">
-              <span className="decision-super-heading">RIDER AI ASSISTANT</span>
-              {!isLoading && !isError && decision && (
+              <span className="decision-super-heading">RIDER AI ARBITRATION</span>
+              
+              {/* AAS Decision Tag (SPEAK / WAIT / MERGE / DROP) */}
+              {decisionMeta && (
+                <span className={`decision-aas-pill ${decisionMeta.className}`}>
+                  {decisionMeta.icon}
+                  <span>{decisionMeta.label}</span>
+                </span>
+              )}
+
+              {/* Reason Code Pill */}
+              {reasonCode && (
+                <span className="decision-reason-pill" title={`Reason code: ${reasonCode}`}>
+                  {reasonCode.replace(/_/g, ' ')}
+                </span>
+              )}
+
+              {!isLoading && !isError && decision && !decisionMeta && (
                 <span className="decision-confidence-badge">
                   <ShieldCheck size={12} className="confidence-icon" />
                   <span>{decision.confidence || 'High Confidence'}</span>
                 </span>
               )}
             </div>
-            <h4 className="decision-card-heading">Latest AI Decision</h4>
+            <h4 className="decision-card-heading">
+              {decisionType ? `AAS Decision: ${decisionType}` : 'Latest AI Decision'}
+            </h4>
           </div>
         </div>
         <span className="decision-timestamp">
@@ -56,7 +122,7 @@ export default function AIDecisionCard({
             <div className="skeleton-bar skeleton-quote" />
             <div className="skeleton-bar skeleton-action" />
           </div>
-          <p className="decision-loading-text">Analyzing telemetry & formulating optimal routing...</p>
+          <p className="decision-loading-text">AAS evaluating safety, DND, and event priority...</p>
         </div>
       )}
 
@@ -78,29 +144,32 @@ export default function AIDecisionCard({
       )}
 
       {/* Empty State */}
-      {!isLoading && !isError && (!decision || !decision.trigger) && (
+      {!isLoading && !isError && (!decision || !triggerText) && (
         <div className="decision-empty-state">
           <div className="empty-state-icon">
             <Inbox size={24} />
           </div>
           <h5 className="empty-state-title">No AI Decisions Yet</h5>
           <p className="empty-state-desc">
-            The Rider AI Assistant actively evaluates incoming delivery events and route conditions to provide autonomous decisions.
+            The Rider AI Arbitration System (AAS) actively scores incoming events to deliver optimal, safety-first decisions.
           </p>
         </div>
       )}
 
       {/* 3-Stage Event -> AI -> Action Flow */}
-      {!isLoading && !isError && decision && decision.trigger && (
+      {!isLoading && !isError && decision && triggerText && (
         <div className="decision-workflow-container">
           {/* Stage 1: Trigger Event */}
           <div className="workflow-stage stage-trigger">
             <div className="stage-header">
               <span className="stage-step-tag">1</span>
               <span className="stage-label">Trigger Event</span>
+              {decision.type && (
+                <span className="stage-type-subtag">{decision.type}</span>
+              )}
             </div>
             <div className="stage-content">
-              <p className="trigger-text">"{decision.trigger}"</p>
+              <p className="trigger-text">"{triggerText}"</p>
             </div>
           </div>
 
@@ -117,10 +186,25 @@ export default function AIDecisionCard({
               <span className="stage-step-tag tag-violet">
                 <Sparkles size={11} />
               </span>
-              <span className="stage-label violet-label">AI Response Generated</span>
+              <span className="stage-label violet-label">AAS Arbitration & AI Response</span>
+              {decision.basePriority && (
+                <span className="stage-priority-subtag">
+                  Priority: {decision.basePriority}
+                </span>
+              )}
             </div>
             <div className="stage-content">
-              <p className="ai-response-quote">"{decision.response}"</p>
+              <p className="ai-response-quote">
+                "{decision.response || (
+                  decision.decision === 'SPEAK'
+                    ? 'AAS evaluated CRITICAL_SAFETY / HIGH_URGENCY. Speaking alert to rider immediately.'
+                    : decision.decision === 'WAIT'
+                    ? 'Another event is currently playing or higher priority is active. Placed in EventQueue.'
+                    : decision.decision === 'MERGE'
+                    ? 'Merged into current route navigation message to minimize rider distractions.'
+                    : 'Suppressed per AAS attention management rules.'
+                )}"
+              </p>
             </div>
           </div>
 
@@ -140,7 +224,17 @@ export default function AIDecisionCard({
               <span className="stage-label green-label">Action Taken</span>
             </div>
             <div className="stage-content">
-              <p className="action-taken-text">{decision.action}</p>
+              <p className="action-taken-text">
+                {decision.action || (
+                  decision.decision === 'SPEAK'
+                    ? `Audio bridge active • Spoken alert relayed to rider headset (${reasonCode || 'SPEAK'})`
+                    : decision.decision === 'WAIT'
+                    ? `Buffered in dispatch queue (${reasonCode || 'WAIT'})`
+                    : decision.decision === 'MERGE'
+                    ? `Combined with existing telemetry instructions (${reasonCode || 'MERGE'})`
+                    : `Event discarded (${reasonCode || 'DROP'})`
+                )}
+              </p>
             </div>
           </div>
         </div>

@@ -4,12 +4,20 @@ import {
   Phone,
   Key,
   Megaphone,
+  AlertTriangle,
   Sliders,
   RotateCcw,
 } from 'lucide-react'
 
 export default function TestEventPanel({ onTriggerEvent, onResetEvents }) {
   const simulationOptions = [
+    {
+      type: 'safety-alert',
+      label: 'Safety Alert (Critical)',
+      icon: <AlertTriangle size={16} />,
+      tagColor: 'rose',
+      sampleDesc: 'Sudden braking / obstacle detected near UPES turn',
+    },
     {
       type: 'nav-event',
       label: 'Navigation Event',

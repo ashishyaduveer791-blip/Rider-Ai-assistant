@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Bell, Sparkles, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
-export default function DashboardHeader({ assistantState }) {
+export default function DashboardHeader({ assistantState, isSocketConnected = true }) {
   const { isDark, toggleTheme } = useTheme()
   const [timeString, setTimeString] = useState('')
 
@@ -73,9 +73,14 @@ export default function DashboardHeader({ assistantState }) {
       <div className="header-left">
         <div className="header-title-row">
           <h1 className="header-greeting">{getGreeting()}, Rider 01</h1>
-          <div className="assistant-online-chip" title={`Assistant is ${assistantState}`}>
-            <span className="online-pulse-pip" aria-hidden="true" />
-            <span className="online-chip-text">Assistant Online</span>
+          <div
+            className={`assistant-online-chip ${isSocketConnected ? 'is-connected' : 'is-offline'}`}
+            title={isSocketConnected ? `AAS Connected • Assistant is ${assistantState}` : 'Connecting to AAS Backend...'}
+          >
+            <span className={`online-pulse-pip ${isSocketConnected ? '' : 'is-offline-pip'}`} aria-hidden="true" />
+            <span className="online-chip-text">
+              {isSocketConnected ? 'AAS Realtime Online' : 'AAS Reconnecting...'}
+            </span>
           </div>
         </div>
         <p className="header-subtitle">Here's what's happening with your deliveries.</p>
