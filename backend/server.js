@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 
 const classifyRoute = require('../ai/classifyRoute');
+const priorityRoute = require('../ai/priorityRoute');
 
 const app = express();
 app.use(cors());
@@ -13,13 +14,14 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', classifyRoute);
+app.use('/api', priorityRoute);
 
 app.use((err, req, res, next) => {
   console.error('[server] unhandled error:', err);
   res.status(500).json({ error: 'internal server error' });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
 });
