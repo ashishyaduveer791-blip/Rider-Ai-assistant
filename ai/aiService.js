@@ -3,7 +3,7 @@ require('dotenv').config();
 const API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${API_KEY}`;
 
-async function callLLM(systemPrompt, userMessage, { timeoutMs = 8000 } = {}) {
+async function callLLM(systemPrompt, userMessage, { timeoutMs = 20000 } = {}) {
   if (!API_KEY) {
     throw new Error('GEMINI_API_KEY missing in environment');
   }
